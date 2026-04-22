@@ -8,6 +8,7 @@ export type KeySlot =
   | 'sunoKey'
   | 'replicateToken'
   | 'runwayKey'
+  | 'githubTelemetryToken'
 
 export type KeyMeta = {
   slot: KeySlot
@@ -61,6 +62,16 @@ export const KEY_CATALOG: KeyMeta[] = [
       'Only needed if you want to run LLM calls outside your Claude subscription. Normally leave empty.',
     docsUrl: 'https://console.anthropic.com/settings/keys',
     usedBy: ['LLM routing fallback'],
+    optional: true
+  },
+  {
+    slot: 'githubTelemetryToken',
+    label: 'GitHub crash-report token (advanced)',
+    description:
+      'Optional. Jarvis has a built-in token for auto-reporting crashes — if it ever expires or hits a limit, paste your own fine-grained PAT here to keep auto-reporting working. Needs Issues: Read and write on pat2114/jarvis-shell (or your fork).',
+    docsUrl:
+      'https://github.com/settings/personal-access-tokens/new?description=Jarvis+Shell+crash+reports',
+    usedBy: ['Crash reporting fallback'],
     optional: true
   }
 ]

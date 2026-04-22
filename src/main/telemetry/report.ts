@@ -1,6 +1,7 @@
 import { app } from 'electron'
 import { logger, tailLog } from '../log/logger'
 import { getProjectState } from '../pipeline/runner'
+import { getKey } from '../setup/keyStore'
 
 const ISSUE_ENDPOINT = 'https://api.github.com/repos/pat2114/jarvis-shell/issues'
 
@@ -17,10 +18,18 @@ export type TelemetryReport = {
 }
 
 function getTelemetryToken(): string | null {
-  // Injected at build time by electron-vite from MAIN_VITE_JARVIS_TELEMETRY_TOKEN.
+  // 1. User-provided token in the encrypted key store (highest priority — lets users
+  //    keep telemetry working if the built-in token expires or gets rate-limited).
+  try {
+    const fromUser = getKey('githubTelemetryToken')
+    if (fromUser && fromUser.trim()) return fromUser.trim()
+  } catch {
+    // safeStorage may not be available in some edge cases; fall through
+  }
+  // 2. Baked-in token from build time (MAIN_VITE_JARVIS_TELEMETRY_TOKEN).
   const fromBuild = import.meta.env.MAIN_VITE_JARVIS_TELEMETRY_TOKEN
   if (typeof fromBuild === 'string' && fromBuild.trim()) return fromBuild.trim()
-  // Runtime fallback for dev sessions that set JARVIS_TELEMETRY_TOKEN.
+  // 3. Runtime env var (dev sessions).
   const fromEnv = process.env.JARVIS_TELEMETRY_TOKEN
   if (fromEnv && fromEnv.trim()) return fromEnv.trim()
   return null

@@ -4,11 +4,12 @@ import {
   Check,
   CheckCircle2,
   Circle,
-  Copy,
+  Download,
   ExternalLink,
   Eye,
   EyeOff,
   Loader2,
+  LogIn,
   RotateCw,
   Trash2,
   XCircle
@@ -87,55 +88,135 @@ function CheckCard({
             )}
           </div>
           <div className="text-xs text-muted-foreground">{check.detail}</div>
-          {check.fixHint && isProblem && (
-            <div className="mt-1 rounded-md border border-border bg-muted px-3 py-2 font-mono text-xs text-muted-foreground">
-              {check.fixHint}
-            </div>
-          )}
-          {isProblem && <CheckActions check={check} />}
+          {isProblem && <CheckActions check={check} tone={tone} />}
         </div>
       </div>
     </div>
   )
 }
 
-function CheckActions({ check }: { check: CheckResult }): React.JSX.Element | null {
-  const [copied, setCopied] = useState(false)
+function InstallProgressInline({ id }: { id: 'claude-code' | 'ffmpeg' }): React.JSX.Element | null {
+  const { installing, installLog } = useSetup()
+  if (installing !== id) return null
+  const tail = installLog.slice(-2)
+  return (
+    <div className="mt-2 flex flex-col gap-1.5">
+      <div className="inline-flex items-center gap-2 text-xs text-muted-foreground">
+        <Loader2 className="size-3.5 animate-spin" />
+        <span>Working on it…</span>
+      </div>
+      {tail.length > 0 && (
+        <div className="rounded-md border border-border bg-muted px-3 py-2 font-mono text-[11px] leading-relaxed text-muted-foreground">
+          {tail.map((line, i) => (
+            <div key={i} className="truncate">
+              {line}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
+function CheckActions({
+  check,
+  tone
+}: {
+  check: CheckResult
+  tone: 'required' | 'optional'
+}): React.JSX.Element | null {
+  const { installing, installPackage, signInToClaude, isSigningIn } = useSetup()
 
   if (check.id === 'claude-installed' && check.status === 'missing') {
+    const busy = installing === 'claude-code'
+    const disabled = installing !== null || isSigningIn
     return (
-      <div className="mt-2 flex flex-wrap gap-2">
-        <Button
-          size="sm"
-          variant="outline"
-          onClick={() => openExternal('https://claude.com/claude-code')}
-        >
-          <ExternalLink /> Open install page
-        </Button>
+      <div className="mt-2 flex flex-col gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          <Button
+            size="sm"
+            onClick={() => void installPackage('claude-code')}
+            disabled={disabled}
+          >
+            {busy ? <Loader2 className="animate-spin" /> : <Download />}
+            {busy ? 'Installing Claude Code…' : 'Install Claude Code'}
+          </Button>
+          <button
+            type="button"
+            onClick={() => openExternal('https://claude.com/claude-code')}
+            className="inline-flex items-center gap-1 text-xs text-muted-foreground underline-offset-4 hover:underline"
+          >
+            <ExternalLink className="size-3.5" /> Install manually
+          </button>
+        </div>
+        <InstallProgressInline id="claude-code" />
       </div>
     )
   }
 
   if (check.id === 'claude-auth' && check.status === 'missing') {
-    const onCopy = async (): Promise<void> => {
-      try {
-        await navigator.clipboard.writeText('claude login')
-        setCopied(true)
-        setTimeout(() => setCopied(false), 2000)
-      } catch {
-        // ignore
-      }
-    }
+    const disabled = installing !== null || isSigningIn
     return (
-      <div className="mt-2 flex flex-wrap gap-2">
-        <Button size="sm" variant="outline" onClick={onCopy}>
-          {copied ? <Check /> : <Copy />}
-          {copied ? 'Copied' : 'Copy claude login command'}
-        </Button>
+      <div className="mt-2 flex flex-col gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          <Button size="sm" onClick={() => void signInToClaude()} disabled={disabled}>
+            {isSigningIn ? <Loader2 className="animate-spin" /> : <LogIn />}
+            {isSigningIn ? 'Waiting for sign-in…' : 'Sign in to Claude'}
+          </Button>
+          <button
+            type="button"
+            onClick={() => openExternal('https://docs.anthropic.com/en/docs/claude-code')}
+            className="inline-flex items-center gap-1 text-xs text-muted-foreground underline-offset-4 hover:underline"
+          >
+            <ExternalLink className="size-3.5" /> Docs
+          </button>
+        </div>
+        {isSigningIn && (
+          <p className="text-xs text-muted-foreground">
+            A terminal window opened — complete the sign-in in your browser. This panel updates
+            automatically when you&apos;re done.
+          </p>
+        )}
       </div>
     )
   }
 
+  if (check.id === 'ffmpeg' && check.status !== 'ok') {
+    const busy = installing === 'ffmpeg'
+    const disabled = installing !== null || isSigningIn
+    return (
+      <div className="mt-2 flex flex-col gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          <Button
+            size="sm"
+            variant={tone === 'optional' ? 'outline' : 'default'}
+            onClick={() => void installPackage('ffmpeg')}
+            disabled={disabled}
+          >
+            {busy ? <Loader2 className="animate-spin" /> : <Download />}
+            {busy ? 'Installing FFmpeg…' : 'Install FFmpeg'}
+          </Button>
+          <button
+            type="button"
+            onClick={() => openExternal('https://ffmpeg.org/download.html')}
+            className="inline-flex items-center gap-1 text-xs text-muted-foreground underline-offset-4 hover:underline"
+          >
+            <ExternalLink className="size-3.5" /> Install manually
+          </button>
+        </div>
+        <InstallProgressInline id="ffmpeg" />
+      </div>
+    )
+  }
+
+  // Fallback: show raw hint for any other failing check we don't yet automate.
+  if (check.fixHint) {
+    return (
+      <div className="mt-2 rounded-md border border-border bg-muted px-3 py-2 font-mono text-xs text-muted-foreground">
+        {check.fixHint}
+      </div>
+    )
+  }
   return null
 }
 

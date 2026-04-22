@@ -1,11 +1,56 @@
-import { Sparkles } from 'lucide-react'
-import { useSetup } from '@/setup/useSetup'
+import { Download, Loader2, Sparkles } from 'lucide-react'
+import { useSetup, type InstallId } from '@/setup/useSetup'
 import { ChecksList, KeysList, SectionWrap } from '@/setup/SetupSections'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent } from '@/components/ui/card'
+
+function installLabel(id: InstallId | null, isSigningIn: boolean): string {
+  if (isSigningIn) return 'Signing in to Claude…'
+  if (id === 'claude-code') return 'Installing Claude Code…'
+  if (id === 'ffmpeg') return 'Installing FFmpeg…'
+  return 'Working on it…'
+}
+
+function ActiveProgressCard(): React.JSX.Element | null {
+  const { installing, installLog, isSigningIn } = useSetup()
+  if (!installing && !isSigningIn) return null
+
+  const tail = installLog.slice(-3)
+  const label = installLabel(installing, isSigningIn)
+
+  return (
+    <Card className="border-primary/30 bg-primary/5">
+      <CardContent className="flex flex-col gap-3 py-4">
+        <div className="flex items-center gap-3">
+          <Loader2 className="size-5 animate-spin text-primary" />
+          <div className="flex flex-col">
+            <div className="text-sm font-medium">{label}</div>
+            <div className="text-xs text-muted-foreground">
+              {isSigningIn
+                ? 'A terminal window opened — finish sign-in in your browser. We will pick up from here.'
+                : 'This runs silently in the background. You can keep reading while it works.'}
+            </div>
+          </div>
+        </div>
+        {!isSigningIn && tail.length > 0 && (
+          <div className="rounded-md border border-border bg-muted px-3 py-2 font-mono text-[11px] leading-relaxed text-muted-foreground">
+            {tail.map((line, i) => (
+              <div key={i} className="truncate">
+                {line}
+              </div>
+            ))}
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  )
+}
 
 export function OnboardingPanel(): React.JSX.Element {
-  const { status } = useSetup()
+  const { status, isReady, installing, isSigningIn, installEverything } = useSetup()
   const required = status?.required ?? []
   const optional = status?.optional ?? []
+  const showHero = !isReady && !installing && !isSigningIn
 
   return (
     <div className="mx-auto flex min-h-full max-w-2xl flex-col gap-8 p-6">
@@ -20,6 +65,24 @@ export function OnboardingPanel(): React.JSX.Element {
           calls you make.
         </p>
       </header>
+
+      {showHero && (
+        <Card className="border-primary/30 bg-primary/5">
+          <CardContent className="flex flex-col gap-3 py-5 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex flex-col gap-1">
+              <div className="text-sm font-semibold">Install everything</div>
+              <p className="text-xs text-muted-foreground">
+                One click. I&apos;ll install Claude Code, sign you in, and set up FFmpeg.
+              </p>
+            </div>
+            <Button onClick={() => void installEverything()} className="sm:shrink-0">
+              <Download /> Install everything
+            </Button>
+          </CardContent>
+        </Card>
+      )}
+
+      <ActiveProgressCard />
 
       <SectionWrap>
         <ChecksList
@@ -44,9 +107,8 @@ export function OnboardingPanel(): React.JSX.Element {
       </SectionWrap>
 
       <footer className="rounded-lg border border-border bg-muted/40 px-4 py-3 text-xs text-muted-foreground">
-        Once all required dependencies are ready, the app will open automatically. Tap{' '}
-        <span className="font-medium text-foreground">Re-check</span> above after you install or
-        sign in.
+        Once everything is ready, the app will open automatically. This panel refreshes itself after
+        each install or sign-in.
       </footer>
     </div>
   )

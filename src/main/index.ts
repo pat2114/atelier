@@ -31,6 +31,7 @@ import {
   setKey,
   type KeySlot
 } from './setup/keyStore'
+import { installPackage, startClaudeLoginFlow, type InstallId } from './setup/autoInstall'
 
 let mainWindow: BrowserWindow | null = null
 let previewWindow: BrowserWindow | null = null
@@ -242,6 +243,18 @@ app.whenReady().then(() => {
 
   ipcMain.handle('setup:has-key', async (_evt, slot: KeySlot) => {
     return getKey(slot) !== null
+  })
+
+  ipcMain.handle('setup:install-package', async (_evt, id: InstallId) => {
+    const ok = await installPackage(id, (event) => {
+      mainWindow?.webContents.send('setup:install-progress', event)
+    })
+    return { ok }
+  })
+
+  ipcMain.handle('setup:start-claude-login', async () => {
+    const ok = await startClaudeLoginFlow()
+    return { ok }
   })
 
   ipcMain.on('help:open', () => {

@@ -55,7 +55,23 @@ const api = {
     setKey: (slot: string, value: string): Promise<unknown> =>
       ipcRenderer.invoke('setup:set-key', { slot, value }),
     clearKey: (slot: string): Promise<unknown> => ipcRenderer.invoke('setup:clear-key', slot),
-    hasKey: (slot: string): Promise<unknown> => ipcRenderer.invoke('setup:has-key', slot)
+    hasKey: (slot: string): Promise<unknown> => ipcRenderer.invoke('setup:has-key', slot),
+    installPackage: (id: 'claude-code' | 'ffmpeg'): Promise<unknown> =>
+      ipcRenderer.invoke('setup:install-package', id),
+    startClaudeLogin: (): Promise<unknown> =>
+      ipcRenderer.invoke('setup:start-claude-login'),
+    onInstallProgress: (
+      cb: (event: {
+        id: 'claude-code' | 'ffmpeg'
+        phase: 'starting' | 'running' | 'success' | 'failure'
+        line?: string
+        error?: string
+      }) => void
+    ): (() => void) => {
+      const listener = (_: unknown, event: unknown): void => cb(event as Parameters<typeof cb>[0])
+      ipcRenderer.on('setup:install-progress', listener)
+      return () => ipcRenderer.removeListener('setup:install-progress', listener)
+    }
   },
   help: {
     open: (): void => ipcRenderer.send('help:open'),

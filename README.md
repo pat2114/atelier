@@ -1,6 +1,8 @@
-# jarvis-shell
+# Atelier
 
-An Electron application with React and TypeScript
+A desktop app that produces 30-second advertising videos for small businesses through a guided, checkpoint-driven workflow. Electron + React + TypeScript.
+
+*(Repo name remains `jarvis-shell` — historical; the app ships as "Atelier".)*
 
 ## Recommended IDE Setup
 

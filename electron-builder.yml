@@ -1,5 +1,5 @@
-appId: dev.jarvis.shell
-productName: Jarvis Shell
+appId: dev.atelier.app
+productName: Atelier
 directories:
   buildResources: build
 files:

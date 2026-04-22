@@ -88,7 +88,7 @@ function createHelpWindow(): void {
     height: 720,
     show: false,
     autoHideMenuBar: true,
-    title: 'Jarvis — Co-pilot',
+    title: 'Atelier — Co-pilot',
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
       sandbox: false

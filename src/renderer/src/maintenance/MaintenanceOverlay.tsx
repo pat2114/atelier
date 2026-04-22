@@ -113,7 +113,7 @@ function UpdateBody({
           </IconBadge>
         }
         title="Checking for updates"
-        subtitle="Making sure you have the latest Jarvis."
+        subtitle="Making sure you have the latest Atelier."
       />
     )
   }
@@ -141,7 +141,7 @@ function UpdateBody({
             <Loader2 />
           </IconBadge>
         }
-        title={`Updating Jarvis — ${percent}%`}
+        title={`Updating Atelier — ${percent}%`}
         subtitle={`${state.transferredMB} / ${state.totalMB} MB downloaded.`}
       >
         <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
@@ -163,7 +163,7 @@ function UpdateBody({
           </IconBadge>
         }
         title="Update ready"
-        subtitle={'Restart Jarvis to apply the update. Nothing you’ve done will be lost.'}
+        subtitle={'Restart Atelier to apply the update. Nothing you’ve done will be lost.'}
       >
         <div className="flex flex-wrap items-center justify-end gap-2">
           <button

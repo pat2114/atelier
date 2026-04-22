@@ -1,5 +1,5 @@
-Jarvis Shell
-============
+Atelier
+=======
 
 Turns a company into a finished 30-second ad video through a guided,
 checkpoint-by-checkpoint workflow. You approve each step; the AI does
@@ -15,7 +15,7 @@ Windows may show "Windows protected your PC" — click "More info"
 then "Run anyway". Only needed the first time.
 
 The app opens to a setup screen. Click **Install everything** and
-Jarvis handles the rest:
+Atelier handles the rest:
 
    - Downloads and installs Claude Code
    - Opens a one-time browser sign-in for your Claude subscription
@@ -25,7 +25,7 @@ You'll see a UAC prompt once for the Claude Code install — accept it.
 You'll see a browser for the Claude sign-in — log in with the account
 that holds your Claude subscription (Pro or Max).
 
-When all checks are green, Jarvis switches to the project screen
+When all checks are green, Atelier switches to the project screen
 automatically.
 
 
@@ -47,11 +47,11 @@ Your keys are encrypted with the Windows credential store before
 being written to disk.
 
 
-USING JARVIS
-------------
+USING ATELIER
+-------------
 
 - Enter a company name and website URL.
-- Jarvis fetches the site, summarises it, and proposes a campaign.
+- Atelier fetches the site, summarises it, and proposes a campaign.
 - Seven checkpoints: research, script, storyboard, visuals, voice-over,
   music, final cut. Approve or Request revision with a short note.
 - Chat box at the bottom adjusts the app's look on command:
@@ -70,7 +70,7 @@ that feels too salesy?", "three opening lines warmer than this", etc.
 AUTO-UPDATE
 -----------
 
-Jarvis checks for a new version every 30 minutes. When one exists,
+Atelier checks for a new version every 30 minutes. When one exists,
 it downloads in the background and shows a **Restart now** button.
 Restart to apply. Your project state is preserved.
 
@@ -78,7 +78,7 @@ Restart to apply. Your project state is preserved.
 SELF-MAINTENANCE
 ----------------
 
-Jarvis is a prototype. When something hiccups, you see a friendly
+Atelier is a prototype. When something hiccups, you see a friendly
 "maintenance" screen instead of a technical error. The app reports
 itself for repair and (when the fix ships) quietly updates.
 
@@ -94,7 +94,7 @@ TROUBLESHOOTING
     will do its best from the company name alone.
 
 - The app doesn't open:
-    Delete %APPDATA%\Jarvis Shell and try again. Clears cached state
+    Delete %APPDATA%\Atelier and try again. Clears cached state
     but not your API keys.
 
 - SmartScreen keeps blocking:
@@ -104,7 +104,7 @@ TROUBLESHOOTING
 PRIVACY
 -------
 
-Jarvis runs locally. Your keys never leave your machine except as
+Atelier runs locally. Your keys never leave your machine except as
 headers on calls YOU make. The only unsolicited outbound traffic is
 a version check to GitHub every 30 minutes, plus anonymous crash
 reports when something breaks.
